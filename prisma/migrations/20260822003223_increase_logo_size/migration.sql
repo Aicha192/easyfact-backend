@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `parametres` MODIFY `logo` LONGTEXT NOT NULL;
+ALTER TABLE `Parametres` MODIFY `logo` LONGTEXT NOT NULL;

@@ -1,24 +1,24 @@
 -- Ajouter temporairement les colonnes comme nullable
-ALTER TABLE `parametres`
+ALTER TABLE `Parametres`
 ADD COLUMN `entrepriseId` INTEGER NULL;
 
-ALTER TABLE `produit`
+ALTER TABLE `Produit`
 ADD COLUMN `entrepriseId` INTEGER NULL;
 
 -- Rattacher les anciennes données à EasyFact (entreprise id = 1)
-UPDATE `parametres`
+UPDATE `Parametres`
 SET `entrepriseId` = 1
 WHERE `entrepriseId` IS NULL;
 
-UPDATE `produit`
+UPDATE `Produit`
 SET `entrepriseId` = 1
 WHERE `entrepriseId` IS NULL;
 
 -- Rendre les colonnes obligatoires
-ALTER TABLE `parametres`
+ALTER TABLE `Parametres`
 MODIFY COLUMN `entrepriseId` INTEGER NOT NULL;
 
-ALTER TABLE `produit`
+ALTER TABLE `Produit`
 MODIFY COLUMN `entrepriseId` INTEGER NOT NULL;
 
 -- Une entreprise ne peut avoir qu'un seul paramètre

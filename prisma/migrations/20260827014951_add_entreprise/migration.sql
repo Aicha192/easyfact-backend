@@ -1,8 +1,8 @@
 -- AlterTable
-ALTER TABLE `client` ADD COLUMN `entrepriseId` INTEGER NULL;
+ALTER TABLE `Client` ADD COLUMN `entrepriseId` INTEGER NULL;
 
 -- AlterTable
-ALTER TABLE `user` ADD COLUMN `entrepriseId` INTEGER NULL;
+ALTER TABLE `User` ADD COLUMN `entrepriseId` INTEGER NULL;
 
 -- CreateTable
 CREATE TABLE `Entreprise` (

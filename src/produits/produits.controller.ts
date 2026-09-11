@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProduitsService } from './produits.service';
 import { JwtGuard } from '../auth/jwt/jwt.guard';
+import { CreateProduitDto } from './dto/create-produit.dto';
 
 
 @UseGuards(JwtGuard)
@@ -28,15 +29,7 @@ getProduits(@Req() request: any) {
 @Post()
 createProduit(
   @Req() request: any,
-  @Body()
-  produit: {
-    reference: string;
-    nom: string;
-    categorie: 'Produit' | 'Service';
-    prix: number;
-    unite: string;
-    statut: 'Actif' | 'Inactif';
-  },
+  @Body() produit: CreateProduitDto,
 ) {
   return this.produitsService.createProduit(
     produit,

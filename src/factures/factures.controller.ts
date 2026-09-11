@@ -12,6 +12,7 @@ import {
 import { FacturesService } from './factures.service';
 import { JwtGuard } from '../auth/jwt/jwt.guard';
 import { CreateFactureDto } from './dto/create-facture.dto';
+import { UpdateFactureDto } from './dto/update-facture.dto';
 
 @UseGuards(JwtGuard)
 @Controller('factures')
@@ -40,7 +41,7 @@ createFacture(
 updateFacture(
   @Req() request: any,
   @Param('id') id: string,
-  @Body() facture: any,
+ @Body() facture: UpdateFactureDto,
 ) {
   return this.facturesService.updateFacture(
     Number(id),

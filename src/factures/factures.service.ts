@@ -27,12 +27,11 @@ export class FacturesService {
       numero: string;
       client: string;
       items: {
-        id: number;
-        designation: string;
-        quantite: number;
-        prixUnitaire: number;
-        total: number;
-      }[];
+  designation: string;
+  quantite: number;
+  prixUnitaire: number;
+  total: number;
+}[];
       dateEmission: string;
       dateEcheance: string;
       montantHT: number;

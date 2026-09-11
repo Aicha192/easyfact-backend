@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FacturesService } from './factures.service';
 import { JwtGuard } from '../auth/jwt/jwt.guard';
+import { CreateFactureDto } from './dto/create-facture.dto';
 
 @UseGuards(JwtGuard)
 @Controller('factures')
@@ -27,7 +28,7 @@ getFactures(@Req() request: any) {
 @Post()
 createFacture(
   @Req() request: any,
-  @Body() facture: any,
+  @Body() facture: CreateFactureDto,
 ) {
   return this.facturesService.createFacture(
     facture,

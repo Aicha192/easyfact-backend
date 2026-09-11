@@ -12,6 +12,7 @@ import {
 import { ProformasService } from './proformas.service';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
 import { CreateProformaDto } from './dto/create-proforma.dto';
+import { UpdateProformaDto } from './dto/update-proforma.dto';
 
 @UseGuards(JwtGuard)
 @Controller('proformas')
@@ -40,7 +41,7 @@ getProformas(@Req() request: any) {
 updateProforma(
   @Req() request: any,
   @Param('id') id: string,
-  @Body() proforma: any,
+  @Body() proforma: UpdateProformaDto
 ) {
   return this.proformasService.updateProforma(
     Number(id),

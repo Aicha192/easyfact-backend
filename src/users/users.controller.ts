@@ -40,10 +40,6 @@ export class UsersController {
       nouveauPassword?: string;
     },
   ) {
-     console.log('========== PUT /users/me ==========');
-  console.log('USER JWT :', req.user);
-  console.log('BODY :', data);
-  console.log('===================================');
 
     return this.usersService.updateUser(req.user.userId, data);
   }

@@ -12,6 +12,7 @@ import {
 import { ProduitsService } from './produits.service';
 import { JwtGuard } from '../auth/jwt/jwt.guard';
 import { CreateProduitDto } from './dto/create-produit.dto';
+import { UpdateProduitDto } from './dto/update-produit.dto';
 
 
 @UseGuards(JwtGuard)
@@ -41,15 +42,7 @@ createProduit(
 updateProduit(
   @Req() request: any,
   @Param('id') id: string,
-  @Body()
-  produit: {
-    reference: string;
-    nom: string;
-    categorie: 'Produit' | 'Service';
-    prix: number;
-    unite: string;
-    statut: 'Actif' | 'Inactif';
-  },
+  @Body() produit: UpdateProduitDto,
 ) {
   return this.produitsService.updateProduit(
     Number(id),

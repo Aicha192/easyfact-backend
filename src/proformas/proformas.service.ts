@@ -22,7 +22,6 @@ export class ProformasService {
     numero: string;
     client: string;
     items: {
-      id: number;
       designation: string;
       quantite: number;
       prixUnitaire: number;

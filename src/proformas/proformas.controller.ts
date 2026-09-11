@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProformasService } from './proformas.service';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
+import { CreateProformaDto } from './dto/create-proforma.dto';
 
 @UseGuards(JwtGuard)
 @Controller('proformas')
@@ -27,7 +28,7 @@ getProformas(@Req() request: any) {
   @Post()
   createProforma(
   @Req() request: any,
-  @Body() proforma: any,
+ @Body() proforma: CreateProformaDto
 ) {
   return this.proformasService.createProforma(
     proforma,

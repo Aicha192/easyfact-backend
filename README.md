@@ -1,98 +1,184 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# EasyFact — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend de l'application **EasyFact**, une solution web de facturation électronique destinée à faciliter la gestion des clients, produits, services et factures pour les entreprises.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Le backend fournit une API REST développée avec **NestJS**, avec **Prisma** pour l'accès aux données et **MySQL/MariaDB** comme système de gestion de base de données.
 
-## Description
+## 🚀 Technologies utilisées
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* **NestJS** — Framework backend Node.js
+* **TypeScript** — Langage principal
+* **Prisma** — ORM
+* **MySQL / MariaDB** — Base de données
+* **REST API** — Communication avec le frontend
+* **Railway** — Déploiement du backend
 
-## Project setup
+## 📁 Structure du projet
 
-```bash
-$ npm install
+```text
+backend/
+├── src/
+│   ├── ...
+│   ├── app.module.ts
+│   └── main.ts
+├── prisma/
+│   └── schema.prisma
+├── .env
+├── .gitignore
+├── package.json
+├── prisma.config.ts
+└── README.md
 ```
 
-## Compile and run the project
+> Les fichiers contenant des informations sensibles, notamment `.env`, ne sont pas versionnés dans Git.
+
+## ⚙️ Installation
+
+### 1. Cloner le projet
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/Aicha192/easyfact-backend.git
+cd easyfact-backend
 ```
 
-## Run tests
+### 2. Installer les dépendances
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+### 3. Configurer les variables d'environnement
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Créer un fichier `.env` à la racine du projet :
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+```env
+DATABASE_URL="votre_url_de_base_de_donnees"
+```
+
+Les valeurs réelles des variables d'environnement doivent rester privées et ne doivent jamais être publiées sur GitHub.
+
+### 4. Générer Prisma Client
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma generate
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 5. Préparer la base de données
 
-## Resources
+Selon l'environnement de développement :
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npx prisma migrate dev
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## ▶️ Lancer le projet
 
-## Support
+### Développement
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run start:dev
+```
 
-## Stay in touch
+### Production
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm run build
+npm run start:prod
+```
 
-## License
+## 🔌 API
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Le backend expose une API REST utilisée par le frontend EasyFact.
+
+Les différentes fonctionnalités de l'application sont progressivement organisées autour de ressources telles que :
+
+* Clients
+* Produits et services
+* Factures
+* Utilisateurs
+* Authentification
+* Gestion des données de facturation
+
+L'API est conçue pour être consommée par le frontend React de l'application.
+
+## 🗄️ Base de données
+
+EasyFact utilise **Prisma** comme couche d'accès aux données.
+
+Le schéma de la base de données est défini dans :
+
+```text
+prisma/schema.prisma
+```
+
+Pour consulter Prisma Studio :
+
+```bash
+npx prisma studio
+```
+
+## 🌍 Déploiement
+
+Le backend EasyFact est déployé sur **Railway**.
+
+Le frontend est déployé séparément sur **Vercel**.
+
+```text
+Frontend
+React + Vite
+     │
+     ▼
+  Vercel
+     │
+     │ HTTP / REST API
+     ▼
+Backend
+NestJS
+     │
+     ▼
+ Railway
+     │
+     ▼
+MySQL / MariaDB
+```
+
+## 🔐 Sécurité
+
+Le projet applique plusieurs bonnes pratiques de sécurité :
+
+* Les variables d'environnement et secrets ne sont pas versionnés.
+* Aucun secret sensible n'est stocké directement dans le code source.
+* Les fichiers `.env` sont exclus du dépôt Git.
+* Les informations sensibles doivent être configurées dans l'environnement de déploiement.
+* Le code backend est préparé pour fonctionner dans un environnement de production.
+
+## 🎯 Objectif du projet
+
+EasyFact est développé comme un projet de **facturation électronique** avec l'objectif de dépasser progressivement le cadre d'un simple projet académique pour évoluer vers une solution professionnelle présentable aux entreprises.
+
+L'objectif est notamment de permettre à une entreprise de :
+
+* gérer ses clients ;
+* gérer ses produits et services ;
+* créer et gérer ses factures ;
+* suivre les statuts des factures ;
+* consulter ses données de facturation ;
+* centraliser ses opérations dans une interface simple et moderne.
+
+## 🔗 Projets associés
+
+**Frontend EasyFact :**
+
+https://github.com/Aicha192/easyfact
+
+**Backend EasyFact :**
+
+https://github.com/Aicha192/easyfact-backend
+
+## 👩‍💻 Développement
+
+EasyFact est développé avec une architecture séparant le frontend et le backend afin de faciliter la maintenance, le déploiement et l'évolution future de l'application.
+
+---
+
+**EasyFact — Simplifier la facturation, une facture à la fois.**

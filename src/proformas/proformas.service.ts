@@ -124,8 +124,8 @@ export class ProformasService {
     data: {
       numero: proforma.numero,
       client: proforma.client,
-      dateEmission: new Date(`${proforma.dateEmission}T00:00:00`),
-      dateValidite: new Date(`${proforma.dateValidite}T00:00:00`),
+      dateEmission: new Date(proforma.dateEmission),
+      dateValidite: new Date(proforma.dateValidite),
       montantHT: proforma.montantHT,
       tva: proforma.tva,
       montantTTC: proforma.montantTTC,

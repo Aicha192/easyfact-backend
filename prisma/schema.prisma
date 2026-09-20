@@ -142,6 +142,8 @@ model User {
   email        String      @unique
   telephone    String
   password     String
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
   role         String
   avatar       String?     @db.LongText
   entrepriseId Int?

@@ -2,6 +2,8 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +47,32 @@ async register(@Body() data: RegisterDto) {
   return {
     message: 'Compte créé avec succès',
     user,
+  };
+}
+@Post('forgot-password')
+async forgotPassword(@Body() data: ForgotPasswordDto) {
+  await this.authService.forgotPassword(data.email);
+
+  return {
+    message:
+      'Si cette adresse e-mail existe, un lien de réinitialisation a été envoyé.',
+  };
+}
+@Post('reset-password')
+async resetPassword(@Body() data: ResetPasswordDto) {
+  const success = await this.authService.resetPassword(
+    data.token,
+    data.password,
+  );
+
+  if (!success) {
+    return {
+      message: 'Le lien de réinitialisation est invalide ou expiré.',
+    };
+  }
+
+  return {
+    message: 'Mot de passe réinitialisé avec succès.',
   };
 }
 }

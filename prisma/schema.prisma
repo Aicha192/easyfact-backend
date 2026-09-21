@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider     = "prisma-client"
   output       = "../generated/prisma"
@@ -14,20 +9,19 @@ datasource db {
 }
 
 model Entreprise {
-  id        Int      @id @default(autoincrement())
-  nom       String
-  email     String
-  telephone String
-  adresse   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users      User[]
+  id         Int         @id @default(autoincrement())
+  nom        String
+  email      String
+  telephone  String
+  adresse    String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   clients    Client[]
-  produits   Produit[]
-  parametres Parametres?
   factures   Facture[]
+  parametres Parametres?
+  produits   Produit[]
   proformas  Proforma[]
+  users      User[]
 }
 
 model Client {
@@ -37,10 +31,12 @@ model Client {
   telephone    String
   adresse      String
   statut       String
-  entrepriseId Int?
-  entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  entrepriseId Int?
+  entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+
+  @@index([entrepriseId], map: "Client_entrepriseId_fkey")
 }
 
 model Produit {
@@ -51,10 +47,12 @@ model Produit {
   prix         Float
   unite        String
   statut       String
-  entrepriseId Int
-  entreprise   Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  entrepriseId Int
+  entreprise   Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+
+  @@index([entrepriseId], map: "Produit_entrepriseId_fkey")
 }
 
 model Facture {
@@ -68,11 +66,13 @@ model Facture {
   montantTTC   Float
   statut       String
   notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   entrepriseId Int
   entreprise   Entreprise    @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   items        FactureItem[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+
+  @@index([entrepriseId], map: "Facture_entrepriseId_fkey")
 }
 
 model FactureItem {
@@ -83,6 +83,8 @@ model FactureItem {
   total        Float
   factureId    Int
   facture      Facture @relation(fields: [factureId], references: [id], onDelete: Cascade)
+
+  @@index([factureId], map: "FactureItem_factureId_fkey")
 }
 
 model Proforma {
@@ -97,12 +99,13 @@ model Proforma {
   statut        String
   notes         String?
   factureNumero String?
-  items         ProformaItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   entrepriseId  Int
   entreprise    Entreprise     @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+  items         ProformaItem[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([entrepriseId], map: "Proforma_entrepriseId_fkey")
 }
 
 model ProformaItem {
@@ -113,10 +116,12 @@ model ProformaItem {
   total        Float
   proformaId   Int
   proforma     Proforma @relation(fields: [proformaId], references: [id], onDelete: Cascade)
+
+  @@index([proformaId], map: "ProformaItem_proformaId_fkey")
 }
 
 model Parametres {
-  id                 Int    @id @default(autoincrement())
+  id                 Int        @id @default(autoincrement())
   nomEntreprise      String
   responsable        String
   adresse            String
@@ -127,13 +132,11 @@ model Parametres {
   rccm               String
   devise             String
   conditionsPaiement String
-  logo               String @db.LongText
-
-  entrepriseId Int        @unique
-  entreprise   Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  logo               String     @db.LongText
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  entrepriseId       Int        @unique
+  entreprise         Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -142,12 +145,14 @@ model User {
   email        String      @unique
   telephone    String
   password     String
-  resetPasswordToken   String?
-  resetPasswordExpires DateTime?
+  resetPasswordToken    String?
+  resetPasswordExpires  DateTime?
   role         String
   avatar       String?     @db.LongText
-  entrepriseId Int?
-  entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  entrepriseId Int?
+  entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+
+  @@index([entrepriseId], map: "User_entrepriseId_fkey")
 }

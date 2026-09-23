@@ -59,8 +59,19 @@ export class UpdateProformaDto {
   @Min(0)
   montantTTC!: number;
 
-  @IsIn(['Brouillon', 'Envoyée', 'Acceptée', 'Refusée'])
-  statut!: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée';
+  @IsIn([
+  'Brouillon',
+  'Envoyée',
+  'Acceptée',
+  'Refusée',
+  'Expirée',
+])
+statut!:
+  | 'Brouillon'
+  | 'Envoyée'
+  | 'Acceptée'
+  | 'Refusée'
+  | 'Expirée';
 
   @IsOptional()
   @IsString()

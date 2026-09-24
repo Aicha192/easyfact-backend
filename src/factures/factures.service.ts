@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -27,11 +24,11 @@ export class FacturesService {
       numero: string;
       client: string;
       items: {
-  designation: string;
-  quantite: number;
-  prixUnitaire: number;
-  total: number;
-}[];
+        designation: string;
+        quantite: number;
+        prixUnitaire: number;
+        total: number;
+      }[];
       dateEmission: string;
       dateEcheance: string;
       montantHT: number;
@@ -42,26 +39,32 @@ export class FacturesService {
     },
     entrepriseId: number,
   ) {
+    const items = facture.items.map((item) => ({
+      designation: item.designation,
+      quantite: item.quantite,
+      prixUnitaire: item.prixUnitaire,
+      total: item.quantite * item.prixUnitaire,
+    }));
+
+    const montantHT = items.reduce((total, item) => total + item.total, 0);
+
+    const montantTTC = montantHT + (montantHT * facture.tva) / 100;
+
     const newFacture = await this.prisma.facture.create({
       data: {
         numero: facture.numero,
         client: facture.client,
         dateEmission: new Date(facture.dateEmission),
         dateEcheance: new Date(facture.dateEcheance),
-        montantHT: facture.montantHT,
+        montantHT,
         tva: facture.tva,
-        montantTTC: facture.montantTTC,
+        montantTTC,
         statut: facture.statut,
         notes: facture.notes,
         entrepriseId,
 
         items: {
-          create: facture.items.map((item) => ({
-            designation: item.designation,
-            quantite: item.quantite,
-            prixUnitaire: item.prixUnitaire,
-            total: item.total,
-          })),
+          create: items,
         },
       },
       include: {
@@ -97,49 +100,53 @@ export class FacturesService {
     },
     entrepriseId: number,
   ) {
-    const existingFacture =
-      await this.prisma.facture.findFirst({
-        where: {
-          id,
-          entrepriseId,
-        },
-      });
+    const existingFacture = await this.prisma.facture.findFirst({
+      where: {
+        id,
+        entrepriseId,
+      },
+    });
 
     if (!existingFacture) {
       throw new NotFoundException('Facture introuvable');
     }
 
-    const updatedFacture =
-      await this.prisma.facture.update({
-        where: {
-          id,
-        },
-        data: {
-          numero: facture.numero,
-          client: facture.client,
-          dateEmission: new Date(facture.dateEmission),
-          dateEcheance: new Date(facture.dateEcheance),
-          montantHT: facture.montantHT,
-          tva: facture.tva,
-          montantTTC: facture.montantTTC,
-          statut: facture.statut,
-          notes: facture.notes,
+    const items = facture.items.map((item) => ({
+      designation: item.designation,
+      quantite: item.quantite,
+      prixUnitaire: item.prixUnitaire,
+      total: item.quantite * item.prixUnitaire,
+    }));
 
-          items: {
-            deleteMany: {},
+    const montantHT = items.reduce((total, item) => total + item.total, 0);
 
-            create: facture.items.map((item) => ({
-              designation: item.designation,
-              quantite: item.quantite,
-              prixUnitaire: item.prixUnitaire,
-              total: item.total,
-            })),
-          },
+    const montantTTC = montantHT + (montantHT * facture.tva) / 100;
+
+    const updatedFacture = await this.prisma.facture.update({
+      where: {
+        id,
+      },
+      data: {
+        numero: facture.numero,
+        client: facture.client,
+        dateEmission: new Date(facture.dateEmission),
+        dateEcheance: new Date(facture.dateEcheance),
+        montantHT,
+        tva: facture.tva,
+        montantTTC,
+        statut: facture.statut,
+        notes: facture.notes,
+
+        items: {
+          deleteMany: {},
+
+          create: items,
         },
-        include: {
-          items: true,
-        },
-      });
+      },
+      include: {
+        items: true,
+      },
+    });
 
     return {
       message: 'Facture modifiée avec succès',
@@ -147,17 +154,13 @@ export class FacturesService {
     };
   }
 
-  async deleteFacture(
-    id: number,
-    entrepriseId: number,
-  ) {
-    const existingFacture =
-      await this.prisma.facture.findFirst({
-        where: {
-          id,
-          entrepriseId,
-        },
-      });
+  async deleteFacture(id: number, entrepriseId: number) {
+    const existingFacture = await this.prisma.facture.findFirst({
+      where: {
+        id,
+        entrepriseId,
+      },
+    });
 
     if (!existingFacture) {
       throw new NotFoundException('Facture introuvable');

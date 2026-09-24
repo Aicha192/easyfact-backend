@@ -73,13 +73,13 @@ export class UsersService {
         );
       }
 
-      if (data.nouveauPassword.length < 6) {
-        throw new BadRequestException(
-          'Le nouveau mot de passe doit contenir au moins 6 caractères',
-        );
-      }
+     if (data.nouveauPassword.length < 8) {
+  throw new BadRequestException(
+    'Le nouveau mot de passe doit contenir au moins 8 caractères',
+  );
+}
 
-      password = await bcrypt.hash(data.nouveauPassword, 10);
+password = await bcrypt.hash(data.nouveauPassword, 10);
     }
 
     const updatedUser = await this.prisma.user.update({

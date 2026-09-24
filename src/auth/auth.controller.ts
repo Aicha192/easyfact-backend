@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  ConflictException,
+  Controller,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -17,9 +24,7 @@ async login(@Body() data: LoginDto) {
 );
 
     if (!user) {
-      return {
-        message: 'Email ou mot de passe incorrect',
-      };
+  throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
     return {
@@ -39,9 +44,7 @@ async register(@Body() data: RegisterDto) {
   );
 
   if (!user) {
-    return {
-      message: 'Cette adresse e-mail est déjà utilisée',
-    };
+  throw new ConflictException('Cette adresse e-mail est déjà utilisée');
   }
 
   return {
@@ -66,9 +69,9 @@ async resetPassword(@Body() data: ResetPasswordDto) {
   );
 
   if (!success) {
-    return {
-      message: 'Le lien de réinitialisation est invalide ou expiré.',
-    };
+  throw new BadRequestException(
+    'Le lien de réinitialisation est invalide ou expiré.',
+  );
   }
 
   return {

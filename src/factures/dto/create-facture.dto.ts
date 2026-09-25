@@ -32,10 +32,6 @@ export class CreateFactureItemDto {
 export class CreateFactureDto {
   @IsString()
   @IsNotEmpty()
-  numero!: string;
-
-  @IsString()
-  @IsNotEmpty()
   client!: string;
 
   @IsDateString()

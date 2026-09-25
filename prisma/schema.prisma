@@ -22,6 +22,7 @@ model Entreprise {
   produits   Produit[]
   proformas  Proforma[]
   users      User[]
+  factureSequences FactureSequence[]
 }
 
 model Client {
@@ -73,6 +74,7 @@ model Facture {
   items        FactureItem[]
 
   @@index([entrepriseId], map: "Facture_entrepriseId_fkey")
+@@unique([entrepriseId, numero])
 }
 
 model FactureItem {
@@ -155,4 +157,15 @@ model User {
   entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
 
   @@index([entrepriseId], map: "User_entrepriseId_fkey")
+}
+
+model FactureSequence {
+  id            Int        @id @default(autoincrement())
+  entrepriseId  Int
+  annee         Int
+  dernierNumero Int        @default(0)
+  entreprise    Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+
+  @@unique([entrepriseId, annee])
+  @@index([entrepriseId])
 }

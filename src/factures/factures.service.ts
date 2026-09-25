@@ -18,41 +18,63 @@ export class FacturesService {
       },
     });
   }
+async createFacture(
+  facture: {
+    client: string;
+    items: {
+      designation: string;
+      quantite: number;
+      prixUnitaire: number;
+      total: number;
+    }[];
+    dateEmission: string;
+    dateEcheance: string;
+    montantHT: number;
+    tva: number;
+    montantTTC: number;
+    statut: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';
+    notes?: string;
+  },
+  entrepriseId: number,
+) {
+  const items = facture.items.map((item) => ({
+    designation: item.designation,
+    quantite: item.quantite,
+    prixUnitaire: item.prixUnitaire,
+    total: item.quantite * item.prixUnitaire,
+  }));
 
-  async createFacture(
-    facture: {
-      numero: string;
-      client: string;
-      items: {
-        designation: string;
-        quantite: number;
-        prixUnitaire: number;
-        total: number;
-      }[];
-      dateEmission: string;
-      dateEcheance: string;
-      montantHT: number;
-      tva: number;
-      montantTTC: number;
-      statut: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';
-      notes?: string;
-    },
-    entrepriseId: number,
-  ) {
-    const items = facture.items.map((item) => ({
-      designation: item.designation,
-      quantite: item.quantite,
-      prixUnitaire: item.prixUnitaire,
-      total: item.quantite * item.prixUnitaire,
-    }));
+  const montantHT = items.reduce((total, item) => total + item.total, 0);
 
-    const montantHT = items.reduce((total, item) => total + item.total, 0);
+  const montantTTC = montantHT + (montantHT * facture.tva) / 100;
 
-    const montantTTC = montantHT + (montantHT * facture.tva) / 100;
+  const annee = new Date().getFullYear();
 
-    const newFacture = await this.prisma.facture.create({
+  const result = await this.prisma.$transaction(async (tx) => {
+    const sequence = await tx.factureSequence.upsert({
+      where: {
+        entrepriseId_annee: {
+          entrepriseId,
+          annee,
+        },
+      },
+      create: {
+        entrepriseId,
+        annee,
+        dernierNumero: 1,
+      },
+      update: {
+        dernierNumero: {
+          increment: 1,
+        },
+      },
+    });
+
+    const numero = `FAC-${annee}-${String(sequence.dernierNumero).padStart(4, '0')}`;
+
+    const newFacture = await tx.facture.create({
       data: {
-        numero: facture.numero,
+        numero,
         client: facture.client,
         dateEmission: new Date(facture.dateEmission),
         dateEcheance: new Date(facture.dateEcheance),
@@ -62,7 +84,6 @@ export class FacturesService {
         statut: facture.statut,
         notes: facture.notes,
         entrepriseId,
-
         items: {
           create: items,
         },
@@ -72,11 +93,14 @@ export class FacturesService {
       },
     });
 
-    return {
-      message: 'Facture créée avec succès',
-      facture: newFacture,
-    };
-  }
+    return newFacture;
+  });
+
+  return {
+    message: 'Facture créée avec succès',
+    facture: result,
+  };
+}
 
   async updateFacture(
     id: number,

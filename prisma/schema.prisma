@@ -108,6 +108,7 @@ model Proforma {
   items         ProformaItem[]
 
   @@index([entrepriseId], map: "Proforma_entrepriseId_fkey")
+  @@unique([entrepriseId, factureNumero])
 }
 
 model ProformaItem {

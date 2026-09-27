@@ -105,7 +105,6 @@ async createFacture(
   async updateFacture(
     id: number,
     facture: {
-      numero: string;
       client: string;
       items: {
         id: number;
@@ -151,7 +150,6 @@ async createFacture(
         id,
       },
       data: {
-        numero: facture.numero,
         client: facture.client,
         dateEmission: new Date(facture.dateEmission),
         dateEcheance: new Date(facture.dateEcheance),

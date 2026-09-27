@@ -35,10 +35,6 @@ export class UpdateFactureItemDto {
 export class UpdateFactureDto {
   @IsString()
   @IsNotEmpty()
-  numero!: string;
-
-  @IsString()
-  @IsNotEmpty()
   client!: string;
 
   @IsDateString()

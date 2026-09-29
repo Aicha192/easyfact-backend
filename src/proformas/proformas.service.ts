@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class ProformasService {
     },
   });
 }
-   async createProforma(
+ async createProforma(
   proforma: {
     numero: string;
     client: string;
@@ -43,39 +43,49 @@ export class ProformasService {
   },
   entrepriseId: number,
 ) {
-  const newProforma = await this.prisma.proforma.create({
-    data: {
-      numero: proforma.numero,
-      client: proforma.client,
-      dateEmission: new Date(`${proforma.dateEmission}T00:00:00`),
-      dateValidite: new Date(`${proforma.dateValidite}T00:00:00`),
-      montantHT: proforma.montantHT,
-      tva: proforma.tva,
-      montantTTC: proforma.montantTTC,
-      statut: proforma.statut,
-      notes: proforma.notes,
-      factureNumero: proforma.factureNumero,
+  try {
+    const newProforma = await this.prisma.proforma.create({
+      data: {
+        numero: proforma.numero,
+        client: proforma.client,
+        dateEmission: new Date(`${proforma.dateEmission}T00:00:00`),
+        dateValidite: new Date(`${proforma.dateValidite}T00:00:00`),
+        montantHT: proforma.montantHT,
+        tva: proforma.tva,
+        montantTTC: proforma.montantTTC,
+        statut: proforma.statut,
+        notes: proforma.notes,
+        factureNumero: proforma.factureNumero,
 
-      entrepriseId,
+        entrepriseId,
 
-      items: {
-        create: proforma.items.map((item) => ({
-          designation: item.designation,
-          quantite: item.quantite,
-          prixUnitaire: item.prixUnitaire,
-          total: item.total,
-        })),
+        items: {
+          create: proforma.items.map((item) => ({
+            designation: item.designation,
+            quantite: item.quantite,
+            prixUnitaire: item.prixUnitaire,
+            total: item.total,
+          })),
+        },
       },
-    },
-    include: {
-      items: true,
-    },
-  });
+      include: {
+        items: true,
+      },
+    });
 
-  return {
-    message: 'Proforma créée avec succès',
-    proforma: newProforma,
-  };
+    return {
+      message: 'Proforma créée avec succès',
+      proforma: newProforma,
+    };
+  } catch (error: any) {
+    if (error?.code === 'P2002') {
+      throw new ConflictException(
+        'Cette facture est déjà liée à une autre proforma.',
+      );
+    }
+
+    throw error;
+  }
 }
 
  async updateProforma(

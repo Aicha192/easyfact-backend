@@ -1,71 +1,153 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProformasService {
   constructor(private readonly prisma: PrismaService) {}
- async getProformas(entrepriseId: number) {
-  return this.prisma.proforma.findMany({
-    where: {
-      entrepriseId,
-    },
-    include: {
-      items: true,
-    },
-    orderBy: {
-      id: 'asc',
-    },
-  });
-}
- async createProforma(
+  async getProformas(entrepriseId: number) {
+    return this.prisma.proforma.findMany({
+      where: {
+        entrepriseId,
+      },
+      include: {
+        items: true,
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+  async createProforma(
+   proforma: {
+  numero: string;
+  client: string;
+  items: {
+    designation: string;
+    quantite: number;
+    prixUnitaire: number;
+  }[];
+  dateEmission: string;
+  dateValidite: string;
+  tva: number;
+  statut: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée' | 'Expirée';
+  notes?: string;
+  factureNumero?: string;
+},
+    entrepriseId: number,
+  ) {
+    const items = proforma.items.map((item) => ({
+      designation: item.designation,
+      quantite: item.quantite,
+      prixUnitaire: item.prixUnitaire,
+      total: item.quantite * item.prixUnitaire,
+    }));
+
+    const montantHT = items.reduce((total, item) => total + item.total, 0);
+
+    const montantTTC = montantHT + (montantHT * proforma.tva) / 100;
+    try {
+      const newProforma = await this.prisma.proforma.create({
+        data: {
+          numero: proforma.numero,
+          client: proforma.client,
+          dateEmission: new Date(`${proforma.dateEmission}T00:00:00`),
+          dateValidite: new Date(`${proforma.dateValidite}T00:00:00`),
+          montantHT,
+          tva: proforma.tva,
+          montantTTC,
+          statut: proforma.statut,
+          notes: proforma.notes,
+          factureNumero: proforma.factureNumero,
+
+          entrepriseId,
+
+          items: {
+  create: items,
+},
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      return {
+        message: 'Proforma créée avec succès',
+        proforma: newProforma,
+      };
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        throw new ConflictException(
+          'Cette facture est déjà liée à une autre proforma.',
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  async updateProforma(
+  id: number,
   proforma: {
-    numero: string;
-    client: string;
-    items: {
-      designation: string;
-      quantite: number;
-      prixUnitaire: number;
-      total: number;
-    }[];
-    dateEmission: string;
-    dateValidite: string;
-    montantHT: number;
-    tva: number;
-    montantTTC: number;
-    statut:
-      | 'Brouillon'
-      | 'Envoyée'
-      | 'Acceptée'
-      | 'Refusée'
-      | 'Expirée';
-    notes?: string;
-    factureNumero?: string;
-  },
-  entrepriseId: number,
-) {
-  try {
-    const newProforma = await this.prisma.proforma.create({
+  numero: string;
+  client: string;
+  items: {
+    designation: string;
+    quantite: number;
+    prixUnitaire: number;
+  }[];
+  dateEmission: string;
+  dateValidite: string;
+  tva: number;
+  statut: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée' | 'Expirée';
+  notes?: string;
+  factureNumero?: string;
+},
+    entrepriseId: number,
+  ) {
+    const existingProforma = await this.prisma.proforma.findFirst({
+      where: {
+        id,
+        entrepriseId,
+      },
+    });
+
+    if (!existingProforma) {
+      throw new NotFoundException('Proforma introuvable pour cette entreprise');
+    }
+    const items = proforma.items.map((item) => ({
+      designation: item.designation,
+      quantite: item.quantite,
+      prixUnitaire: item.prixUnitaire,
+      total: item.quantite * item.prixUnitaire,
+    }));
+
+    const montantHT = items.reduce((total, item) => total + item.total, 0);
+
+    const montantTTC = montantHT + (montantHT * proforma.tva) / 100;
+
+    const updatedProforma = await this.prisma.proforma.update({
+      where: {
+        id,
+      },
       data: {
         numero: proforma.numero,
         client: proforma.client,
-        dateEmission: new Date(`${proforma.dateEmission}T00:00:00`),
-        dateValidite: new Date(`${proforma.dateValidite}T00:00:00`),
-        montantHT: proforma.montantHT,
+        dateEmission: new Date(proforma.dateEmission),
+        dateValidite: new Date(proforma.dateValidite),
+        montantHT,
         tva: proforma.tva,
-        montantTTC: proforma.montantTTC,
+        montantTTC,
         statut: proforma.statut,
         notes: proforma.notes,
         factureNumero: proforma.factureNumero,
 
-        entrepriseId,
-
         items: {
-          create: proforma.items.map((item) => ({
-            designation: item.designation,
-            quantite: item.quantite,
-            prixUnitaire: item.prixUnitaire,
-            total: item.total,
-          })),
+          deleteMany: {},
+          create: items,
         },
       },
       include: {
@@ -74,117 +156,32 @@ export class ProformasService {
     });
 
     return {
-      message: 'Proforma créée avec succès',
-      proforma: newProforma,
+      message: 'Proforma modifiée avec succès',
+      proforma: updatedProforma,
     };
-  } catch (error: any) {
-    if (error?.code === 'P2002') {
-      throw new ConflictException(
-        'Cette facture est déjà liée à une autre proforma.',
-      );
-    }
-
-    throw error;
   }
-}
-
- async updateProforma(
-  id: number,
-  proforma: {
-    numero: string;
-    client: string;
-    items: {
-      id: number;
-      designation: string;
-      quantite: number;
-      prixUnitaire: number;
-      total: number;
-    }[];
-    dateEmission: string;
-    dateValidite: string;
-    montantHT: number;
-    tva: number;
-    montantTTC: number;
-    statut:
-      | 'Brouillon'
-      | 'Envoyée'
-      | 'Acceptée'
-      | 'Refusée'
-      | 'Expirée';
-    notes?: string;
-    factureNumero?: string;
-  },
-  entrepriseId: number,
-) {
-  const existingProforma = await this.prisma.proforma.findFirst({
-    where: {
-      id,
-      entrepriseId,
-    },
-  });
-
-  if (!existingProforma) {
-    throw new Error('Proforma introuvable pour cette entreprise');
-  }
-
-  const updatedProforma = await this.prisma.proforma.update({
-    where: {
-      id,
-    },
-    data: {
-      numero: proforma.numero,
-      client: proforma.client,
-      dateEmission: new Date(proforma.dateEmission),
-      dateValidite: new Date(proforma.dateValidite),
-      montantHT: proforma.montantHT,
-      tva: proforma.tva,
-      montantTTC: proforma.montantTTC,
-      statut: proforma.statut,
-      notes: proforma.notes,
-      factureNumero: proforma.factureNumero,
-
-      items: {
-        deleteMany: {},
-        create: proforma.items.map((item) => ({
-          designation: item.designation,
-          quantite: item.quantite,
-          prixUnitaire: item.prixUnitaire,
-          total: item.total,
-        })),
-      },
-    },
-    include: {
-      items: true,
-    },
-  });
-
-  return {
-    message: 'Proforma modifiée avec succès',
-    proforma: updatedProforma,
-  };
-}
 
   async deleteProforma(id: number, entrepriseId: number) {
-  const existingProforma = await this.prisma.proforma.findFirst({
-    where: {
-      id,
-      entrepriseId,
-    },
-  });
+    const existingProforma = await this.prisma.proforma.findFirst({
+      where: {
+        id,
+        entrepriseId,
+      },
+    });
 
-  if (!existingProforma) {
-    throw new NotFoundException('Proforma introuvable');
+    if (!existingProforma) {
+      throw new NotFoundException('Proforma introuvable');
+    }
+
+    await this.prisma.proforma.delete({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      message: 'Proforma supprimée avec succès',
+      proformaId: id,
+    };
   }
-
-  await this.prisma.proforma.delete({
-    where: {
-      id,
-    },
-  });
-
-  return {
-    message: 'Proforma supprimée avec succès',
-    proformaId: id,
-  };
-}
 }

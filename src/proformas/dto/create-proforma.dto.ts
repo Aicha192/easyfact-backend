@@ -23,10 +23,6 @@ export class CreateProformaItemDto {
   @IsNumber()
   @Min(0)
   prixUnitaire!: number;
-
-  @IsNumber()
-  @Min(0)
-  total!: number;
 }
 
 export class CreateProformaDto {
@@ -46,29 +42,10 @@ export class CreateProformaDto {
 
   @IsNumber()
   @Min(0)
-  montantHT!: number;
-
-  @IsNumber()
-  @Min(0)
   tva!: number;
 
-  @IsNumber()
-  @Min(0)
-  montantTTC!: number;
-
-  @IsIn([
-  'Brouillon',
-  'Envoyée',
-  'Acceptée',
-  'Refusée',
-  'Expirée',
-])
-statut!:
-  | 'Brouillon'
-  | 'Envoyée'
-  | 'Acceptée'
-  | 'Refusée'
-  | 'Expirée';
+  @IsIn(['Brouillon', 'Envoyée', 'Acceptée', 'Refusée', 'Expirée'])
+  statut!: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée' | 'Expirée';
 
   @IsOptional()
   @IsString()

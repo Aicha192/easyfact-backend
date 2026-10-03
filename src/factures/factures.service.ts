@@ -25,13 +25,10 @@ async createFacture(
       designation: string;
       quantite: number;
       prixUnitaire: number;
-      total: number;
     }[];
     dateEmission: string;
     dateEcheance: string;
-    montantHT: number;
     tva: number;
-    montantTTC: number;
     statut: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';
     notes?: string;
   },
@@ -104,23 +101,19 @@ async createFacture(
 
   async updateFacture(
     id: number,
-    facture: {
-      client: string;
-      items: {
-        id: number;
-        designation: string;
-        quantite: number;
-        prixUnitaire: number;
-        total: number;
-      }[];
-      dateEmission: string;
-      dateEcheance: string;
-      montantHT: number;
-      tva: number;
-      montantTTC: number;
-      statut: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';
-      notes?: string;
-    },
+   facture: {
+  client: string;
+  items: {
+    designation: string;
+    quantite: number;
+    prixUnitaire: number;
+  }[];
+  dateEmission: string;
+  dateEcheance: string;
+  tva: number;
+  statut: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';
+  notes?: string;
+},
     entrepriseId: number,
   ) {
     const existingFacture = await this.prisma.facture.findFirst({

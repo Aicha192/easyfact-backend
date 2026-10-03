@@ -23,10 +23,6 @@ export class CreateFactureItemDto {
   @IsNumber()
   @Min(0)
   prixUnitaire!: number;
-
-  @IsNumber()
-  @Min(0)
-  total!: number;
 }
 
 export class CreateFactureDto {
@@ -42,15 +38,7 @@ export class CreateFactureDto {
 
   @IsNumber()
   @Min(0)
-  montantHT!: number;
-
-  @IsNumber()
-  @Min(0)
   tva!: number;
-
-  @IsNumber()
-  @Min(0)
-  montantTTC!: number;
 
   @IsIn(['Brouillon', 'Envoyée', 'Payée', 'En retard'])
   statut!: 'Brouillon' | 'Envoyée' | 'Payée' | 'En retard';

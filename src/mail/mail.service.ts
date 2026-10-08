@@ -18,7 +18,7 @@ export class MailService {
   ): Promise<void> {
     await this.resend.emails.send({
       from: 'EasyFact <onboarding@resend.dev>',
-      to: email,
+      to: 'delivered@resend.dev',
       subject: 'Réinitialisation de votre mot de passe EasyFact',
       html: `
         <h2>Réinitialisation du mot de passe</h2>

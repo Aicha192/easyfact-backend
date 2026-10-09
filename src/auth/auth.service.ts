@@ -114,6 +114,8 @@ export class AuthService {
     where: { email },
   });
 
+  console.log('FORGOT PASSWORD - user:', user ? user.email : 'NOT FOUND');
+
   // Réponse volontairement générique pour éviter
   // de révéler si l'adresse e-mail existe.
   if (!user) {
@@ -139,6 +141,8 @@ export class AuthService {
   const frontendUrl = 'https://easyfact-chi.vercel.app';
 
   const resetLink = `${frontendUrl}/reset-password?token=${rawToken}`;
+
+  console.log('FORGOT PASSWORD - sending email to:', user.email);
 
   await this.mailService.sendPasswordResetEmail(
     user.email,

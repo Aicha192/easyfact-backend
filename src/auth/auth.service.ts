@@ -114,7 +114,11 @@ export class AuthService {
     where: { email },
   });
 
-  console.log('FORGOT PASSWORD - user:', user ? user.email : 'NOT FOUND');
+  console.log('FORGOT PASSWORD - requested email:', JSON.stringify(email));
+console.log(
+  'FORGOT PASSWORD - user:',
+  user ? user.email : 'NOT FOUND',
+);
 
   // Réponse volontairement générique pour éviter
   // de révéler si l'adresse e-mail existe.

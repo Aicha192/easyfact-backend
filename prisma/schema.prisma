@@ -9,20 +9,20 @@ datasource db {
 }
 
 model Entreprise {
-  id         Int         @id @default(autoincrement())
-  nom        String
-  email      String
-  telephone  String
-  adresse    String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  clients    Client[]
-  factures   Facture[]
-  parametres Parametres?
-  produits   Produit[]
-  proformas  Proforma[]
-  users      User[]
+  id               Int               @id @default(autoincrement())
+  nom              String
+  email            String
+  telephone        String
+  adresse          String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  clients          Client[]
+  factures         Facture[]
   factureSequences FactureSequence[]
+  parametres       Parametres?
+  produits         Produit[]
+  proformas        Proforma[]
+  users            User[]
 }
 
 model Client {
@@ -73,8 +73,8 @@ model Facture {
   entreprise   Entreprise    @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   items        FactureItem[]
 
+  @@unique([entrepriseId, numero])
   @@index([entrepriseId], map: "Facture_entrepriseId_fkey")
-@@unique([entrepriseId, numero])
 }
 
 model FactureItem {
@@ -107,8 +107,8 @@ model Proforma {
   entreprise    Entreprise     @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   items         ProformaItem[]
 
-  @@index([entrepriseId], map: "Proforma_entrepriseId_fkey")
   @@unique([entrepriseId, factureNumero])
+  @@index([entrepriseId], map: "Proforma_entrepriseId_fkey")
 }
 
 model ProformaItem {
@@ -143,19 +143,19 @@ model Parametres {
 }
 
 model User {
-  id           Int         @id @default(autoincrement())
-  nom          String
-  email        String      @unique
-  telephone    String
-  password     String
-  resetPasswordToken    String?
-  resetPasswordExpires  DateTime?
-  role         String
-  avatar       String?     @db.LongText
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  entrepriseId Int?
-  entreprise   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+  id                   Int         @id @default(autoincrement())
+  nom                  String
+  email                String      @unique
+  telephone            String
+  password             String
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  role                 String
+  avatar               String?     @db.LongText
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  entrepriseId         Int?
+  entreprise           Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
 
   @@index([entrepriseId], map: "User_entrepriseId_fkey")
 }

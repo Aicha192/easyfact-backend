@@ -21,17 +21,25 @@ export class AuthService {
     });
 
     if (!user) {
-      return null;
-    }
+  console.log('LOGIN DIAGNOSTIC: USER NOT FOUND');
+  return null;
+}
 
-    const passwordCorrect = await bcrypt.compare(
-      password,
-      user.password,
-    );
+console.log('LOGIN DIAGNOSTIC: USER FOUND');
 
-    if (!passwordCorrect) {
-      return null;
-    }
+const passwordCorrect = await bcrypt.compare(
+  password,
+  user.password,
+);
+
+console.log(
+  'LOGIN DIAGNOSTIC: PASSWORD MATCH =',
+  passwordCorrect,
+);
+
+if (!passwordCorrect) {
+  return null;
+}
 
     const payload = {
       sub: user.id,

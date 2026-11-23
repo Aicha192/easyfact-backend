@@ -1,4 +1,5 @@
 import {
+  ArrayMinSize,
   IsArray,
   IsDateString,
   IsIn,
@@ -7,6 +8,7 @@ import {
   IsOptional,
   IsString,
   Min,
+  Max,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -42,6 +44,7 @@ export class UpdateProformaDto {
 
   @IsNumber()
   @Min(0)
+  @Max(100)
   tva!: number;
 
   @IsIn(['Brouillon', 'Envoyée', 'Acceptée', 'Refusée', 'Expirée'])
@@ -56,6 +59,7 @@ export class UpdateProformaDto {
   factureNumero?: string;
 
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => UpdateProformaItemDto)
   items!: UpdateProformaItemDto[];

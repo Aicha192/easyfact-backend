@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProformasService } from './proformas.service';
-import { JwtGuard } from 'src/auth/jwt/jwt.guard';
+import { JwtGuard } from '../auth/jwt/jwt.guard';
 import { CreateProformaDto } from './dto/create-proforma.dto';
 import { UpdateProformaDto } from './dto/update-proforma.dto';
 

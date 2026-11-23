@@ -1,4 +1,9 @@
+jest.mock('./factures.service', () => ({
+  FacturesService: class FacturesService {},
+}));
+
 import { Test, TestingModule } from '@nestjs/testing';
+import { FacturesService } from './factures.service';
 import { FacturesController } from './factures.controller';
 
 describe('FacturesController', () => {
@@ -7,6 +12,7 @@ describe('FacturesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FacturesController],
+      providers: [FacturesService],
     }).compile();
 
     controller = module.get<FacturesController>(FacturesController);

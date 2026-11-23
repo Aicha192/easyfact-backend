@@ -41,10 +41,10 @@ export class ParametresService {
   let savedParametres;
 
   if (existingParametres) {
-    savedParametres = await this.prisma.parametres.update({
-      where: {
-        id: existingParametres.id,
-      },
+   savedParametres = await this.prisma.parametres.update({
+  where: {
+    entrepriseId,
+  },
       data: {
         nomEntreprise: parametres.nomEntreprise,
         responsable: parametres.responsable,

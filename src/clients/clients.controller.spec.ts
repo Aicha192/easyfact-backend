@@ -1,4 +1,9 @@
+jest.mock('./clients.service', () => ({
+  ClientsService: class ClientsService {},
+}));
+
 import { Test, TestingModule } from '@nestjs/testing';
+import { ClientsService } from './clients.service';
 import { ClientsController } from './clients.controller';
 
 describe('ClientsController', () => {
@@ -7,6 +12,7 @@ describe('ClientsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ClientsController],
+      providers: [ClientsService],
     }).compile();
 
     controller = module.get<ClientsController>(ClientsController);

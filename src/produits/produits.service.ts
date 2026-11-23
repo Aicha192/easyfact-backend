@@ -40,63 +40,61 @@ export class ProduitsService {
     };
   }
 
-  async updateProduit(
-    id: number,
-    produit: {
-      reference: string;
-      nom: string;
-      categorie: 'Produit' | 'Service';
-      prix: number;
-      unite: string;
-      statut: 'Actif' | 'Inactif';
+
+async updateProduit(
+  id: number,
+  produit: {
+    reference: string;
+    nom: string;
+    categorie: 'Produit' | 'Service';
+    prix: number;
+    unite: string;
+    statut: 'Actif' | 'Inactif';
+  },
+  entrepriseId: number,
+) {
+  const result = await this.prisma.produit.updateMany({
+    where: {
+      id,
+      entrepriseId,
     },
-    entrepriseId: number,
-  ) {
-    const existingProduit = await this.prisma.produit.findFirst({
-      where: {
-        id,
-        entrepriseId,
-      },
-    });
+    data: produit,
+  });
 
-    if (!existingProduit) {
-      throw new NotFoundException('Produit introuvable');
-    }
-
-    const updatedProduit = await this.prisma.produit.update({
-      where: {
-        id,
-      },
-      data: produit,
-    });
-
-    return {
-      message: 'Produit modifié avec succès',
-      produit: updatedProduit,
-    };
+  if (result.count === 0) {
+    throw new NotFoundException('Produit introuvable');
   }
 
-  async deleteProduit(id: number, entrepriseId: number) {
-    const existingProduit = await this.prisma.produit.findFirst({
-      where: {
-        id,
-        entrepriseId,
-      },
-    });
+  const updatedProduit = await this.prisma.produit.findFirst({
+    where: {
+      id,
+      entrepriseId,
+    },
+  });
 
-    if (!existingProduit) {
-      throw new NotFoundException('Produit introuvable');
-    }
+  return {
+    message: 'Produit modifié avec succès',
+    produit: updatedProduit,
+  };
+}
 
-    await this.prisma.produit.delete({
-      where: {
-        id,
-      },
-    });
 
-    return {
-      message: 'Produit supprimé avec succès',
-      produitId: id,
-    };
+
+async deleteProduit(id: number, entrepriseId: number) {
+  const result = await this.prisma.produit.deleteMany({
+    where: {
+      id,
+      entrepriseId,
+    },
+  });
+
+  if (result.count === 0) {
+    throw new NotFoundException('Produit introuvable');
   }
+
+  return {
+    message: 'Produit supprimé avec succès',
+    produitId: id,
+  };
+ }
 }

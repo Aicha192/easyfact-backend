@@ -89,49 +89,40 @@ export class ProformasService {
     }
   }
 
-  async updateProforma(
+async updateProforma(
   id: number,
   proforma: {
-  numero: string;
-  client: string;
-  items: {
-    designation: string;
-    quantite: number;
-    prixUnitaire: number;
-  }[];
-  dateEmission: string;
-  dateValidite: string;
-  tva: number;
-  statut: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée' | 'Expirée';
-  notes?: string;
-  factureNumero?: string;
-},
-    entrepriseId: number,
-  ) {
-    const existingProforma = await this.prisma.proforma.findFirst({
+    numero: string;
+    client: string;
+    items: {
+      designation: string;
+      quantite: number;
+      prixUnitaire: number;
+    }[];
+    dateEmission: string;
+    dateValidite: string;
+    tva: number;
+    statut: 'Brouillon' | 'Envoyée' | 'Acceptée' | 'Refusée' | 'Expirée';
+    notes?: string;
+    factureNumero?: string;
+  },
+  entrepriseId: number,
+) {
+  const items = proforma.items.map((item) => ({
+    designation: item.designation,
+    quantite: item.quantite,
+    prixUnitaire: item.prixUnitaire,
+    total: item.quantite * item.prixUnitaire,
+  }));
+
+  const montantHT = items.reduce((total, item) => total + item.total, 0);
+  const montantTTC = montantHT + (montantHT * proforma.tva) / 100;
+
+  const result = await this.prisma.$transaction(async (tx) => {
+    const updateResult = await tx.proforma.updateMany({
       where: {
         id,
         entrepriseId,
-      },
-    });
-
-    if (!existingProforma) {
-      throw new NotFoundException('Proforma introuvable pour cette entreprise');
-    }
-    const items = proforma.items.map((item) => ({
-      designation: item.designation,
-      quantite: item.quantite,
-      prixUnitaire: item.prixUnitaire,
-      total: item.quantite * item.prixUnitaire,
-    }));
-
-    const montantHT = items.reduce((total, item) => total + item.total, 0);
-
-    const montantTTC = montantHT + (montantHT * proforma.tva) / 100;
-
-    const updatedProforma = await this.prisma.proforma.update({
-      where: {
-        id,
       },
       data: {
         numero: proforma.numero,
@@ -144,44 +135,61 @@ export class ProformasService {
         statut: proforma.statut,
         notes: proforma.notes,
         factureNumero: proforma.factureNumero,
+      },
+    });
 
-        items: {
-          deleteMany: {},
-          create: items,
+    if (updateResult.count === 0) {
+      throw new NotFoundException('Proforma introuvable');
+    }
+
+    await tx.proformaItem.deleteMany({
+      where: {
+        proformaId: id,
+        proforma: {
+          entrepriseId,
         },
+      },
+    });
+
+    await tx.proformaItem.createMany({
+      data: items.map((item) => ({
+        ...item,
+        proformaId: id,
+      })),
+    });
+
+    return tx.proforma.findFirst({
+      where: {
+        id,
+        entrepriseId,
       },
       include: {
         items: true,
       },
     });
+  });
 
-    return {
-      message: 'Proforma modifiée avec succès',
-      proforma: updatedProforma,
-    };
+  return {
+    message: 'Proforma modifiée avec succès',
+    proforma: result,
+  };
+}
+
+async deleteProforma(id: number, entrepriseId: number) {
+  const result = await this.prisma.proforma.deleteMany({
+    where: {
+      id,
+      entrepriseId,
+    },
+  });
+
+  if (result.count === 0) {
+    throw new NotFoundException('Proforma introuvable');
   }
 
-  async deleteProforma(id: number, entrepriseId: number) {
-    const existingProforma = await this.prisma.proforma.findFirst({
-      where: {
-        id,
-        entrepriseId,
-      },
-    });
-
-    if (!existingProforma) {
-      throw new NotFoundException('Proforma introuvable');
-    }
-
-    await this.prisma.proforma.delete({
-      where: {
-        id,
-      },
-    });
-
-    return {
-      message: 'Proforma supprimée avec succès',
-      proformaId: id,
-    };
-  }
+  return {
+    message: 'Proforma supprimée avec succès',
+    proformaId: id,
+  };
+ }
 }

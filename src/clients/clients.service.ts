@@ -40,65 +40,60 @@ export class ClientsService {
   }
 
   async updateClient(
-    id: number,
-    client: {
-      nom: string;
-      email: string;
-      telephone: string;
-      adresse: string;
-      statut: 'Actif' | 'Inactif';
+  id: number,
+  client: {
+    nom: string;
+    email: string;
+    telephone: string;
+    adresse: string;
+    statut: 'Actif' | 'Inactif';
+  },
+  entrepriseId: number,
+) {
+  const result = await this.prisma.client.updateMany({
+    where: {
+      id,
+      entrepriseId,
     },
-    entrepriseId: number,
-  ) {
-    const existingClient = await this.prisma.client.findFirst({
-      where: {
-        id,
-        entrepriseId,
-      },
-    });
+    data: client,
+  });
 
-    if (!existingClient) {
-      throw new NotFoundException(
-        'Client introuvable ou non accessible.',
-      );
-    }
-
-    const updatedClient = await this.prisma.client.update({
-      where: {
-        id,
-      },
-      data: client,
-    });
-
-    return {
-      message: 'Client modifié avec succès',
-      client: updatedClient,
-    };
+  if (result.count === 0) {
+    throw new NotFoundException(
+      'Client introuvable ou non accessible.',
+    );
   }
+
+  const updatedClient = await this.prisma.client.findFirst({
+    where: {
+      id,
+      entrepriseId,
+    },
+  });
+
+  return {
+    message: 'Client modifié avec succès',
+    client: updatedClient,
+  };
+}
 
   async deleteClient(id: number, entrepriseId: number) {
-    const existingClient = await this.prisma.client.findFirst({
-      where: {
-        id,
-        entrepriseId,
-      },
-    });
+  const result = await this.prisma.client.deleteMany({
+    where: {
+      id,
+      entrepriseId,
+    },
+  });
 
-    if (!existingClient) {
-      throw new NotFoundException(
-        'Client introuvable ou non accessible.',
-      );
-    }
-
-    await this.prisma.client.delete({
-      where: {
-        id,
-      },
-    });
-
-    return {
-      message: 'Client supprimé avec succès',
-      clientId: id,
-    };
+  if (result.count === 0) {
+    throw new NotFoundException(
+      'Client introuvable ou non accessible.',
+    );
   }
+
+  return {
+    message: 'Client supprimé avec succès',
+    clientId: id,
+  };
+ }
 }

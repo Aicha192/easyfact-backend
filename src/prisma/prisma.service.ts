@@ -31,6 +31,9 @@ export class PrismaService
       password: decodeURIComponent(url.password),
       database: url.pathname.replace(/^\//, ''),
       connectionLimit: 5,
+      connectTimeout: 10000,
+      acquireTimeout: 15000,
+      initializationTimeout: 14000,
       ssl: {
         ca: fs.readFileSync(caPath, 'utf8'),
         rejectUnauthorized: true,
